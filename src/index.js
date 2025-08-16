@@ -4,6 +4,77 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 
+import { library } from '@fortawesome/fontawesome-svg-core';
+
+import { 
+  faUser, 
+  faCog, 
+  faLock, 
+  faCamera, 
+  faEdit, 
+  faCheck, 
+  faTimes, 
+  faEye, 
+  faEyeSlash,
+  faBell,
+  faEnvelope,
+  faPlus,
+  faSearch,
+  faPhone,
+  faVideo,
+  faEllipsisV,
+  faPaperPlane,
+  faPaperclip,
+  faSmile,
+  faChevronDown,
+  faSignOutAlt,
+  faQuestionCircle,
+  faUsers,
+  faShield,
+  faChartBar,
+  faFileAlt,
+  faTrash,
+  faFilter,
+  faDownload,
+  faUpload
+} from '@fortawesome/free-solid-svg-icons';
+
+
+library.add(
+  faUser, 
+  faCog, 
+  faLock, 
+  faCamera, 
+  faEdit, 
+  faCheck, 
+  faTimes, 
+  faEye, 
+  faEyeSlash,
+  faBell,
+  faEnvelope,
+  faPlus,
+  faSearch,
+  faPhone,
+  faVideo,
+  faEllipsisV,
+  faPaperPlane,
+  faPaperclip,
+  faSmile,
+  faChevronDown,
+  faSignOutAlt,
+  faQuestionCircle,
+  faUsers,
+  faShield,
+  faChartBar,
+  faFileAlt,
+  faTrash,
+  faFilter,
+  faDownload,
+  faUpload
+);
+
+
+
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>

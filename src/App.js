@@ -1,12 +1,12 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import { io } from "socket.io-client";  
-import AdminDashboard from "./pages/admin/index.jsx";
+import { io } from "socket.io-client";   
 import Login from "./pages/auth/login.jsx";
 import Signup from "./pages/auth/signup.jsx";
 import Inbox from "./pages/dashboard/Inbox.jsx";
 import Profile from "./pages/dashboard/Profile.jsx";
-import PrivateRoute from "./components/layouts/PrivateRoute.jsx";
+import PrivateRoute from "./components/layouts/PrivateRoute.jsx"; 
 import { AuthProvider } from "./context/AuthContext.js";
+import AdminDashboard from "./pages/admin/AdminDashboard.jsx";
  
 // Change this to your backend URL
 const socket = io("http://localhost:5000");
