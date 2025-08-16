@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 
 const Profile = () => {
@@ -23,6 +23,15 @@ const Profile = () => {
     }
   });
 
+  useEffect(() => {
+    async function fetchUserProfile() {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/user/profile`);
+      const data = await response.json();
+      console.log('User profile data:', data);
+    }
+    fetchUserProfile();
+  },[]);
+
   const onSubmit = async (data) => {
     try {
       console.log('Profile update:', data);
@@ -42,7 +51,7 @@ const Profile = () => {
             <div className="flex items-end -mt-16 mb-4">
               <div className="relative">
                 <img
-                  src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150"
+                  src="/default-user.jpg"
                   alt="Profile"
                   className="w-32 h-32 rounded-full border-4 border-white shadow-lg object-cover"
                 />
@@ -56,7 +65,7 @@ const Profile = () => {
               <div className="ml-6 flex-1">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h1 className="text-2xl font-bold text-gray-900">John Doe</h1>
+                    <h1 className="text-2xl font-bold text-gray-900 mt-50">John Doe</h1>
                     <p className="text-gray-600">Senior Developer, Engineering</p>
                     <div className="flex items-center mt-2">
                       <div className="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
@@ -76,31 +85,18 @@ const Profile = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-3 gap-6 mt-6">
-              <div className="text-center p-4 bg-gray-50 rounded-lg">
-                <div className="text-2xl font-bold text-blue-600">247</div>
-                <div className="text-sm text-gray-600">Messages Sent</div>
-              </div>
-              <div className="text-center p-4 bg-gray-50 rounded-lg">
-                <div className="text-2xl font-bold text-green-600">18</div>
-                <div className="text-sm text-gray-600">Active Chats</div>
-              </div>
-              <div className="text-center p-4 bg-gray-50 rounded-lg">
-                <div className="text-2xl font-bold text-purple-600">3.2k</div>
-                <div className="text-sm text-gray-600">Total Contacts</div>
-              </div>
-            </div>
+
           </div>
         </div>
 
         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
           <div className="border-b border-gray-200">
             <nav className="flex space-x-8 px-6">
-              {{
+              {[
                 { id: 'personal', name: 'Personal Info', icon: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z' },
                 { id: 'settings', name: 'Settings', icon: 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z' },
                 { id: 'security', name: 'Security', icon: 'M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z' }
-              }.map((tab) => (
+              ].map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
@@ -267,12 +263,12 @@ const Profile = () => {
                 <h3 className="text-lg font-medium text-gray-900">Notification Settings</h3>
                 
                 <div className="space-y-4">
-                  {{
+                  {[
                     { id: 'email_notifications', label: 'Email Notifications', description: 'Receive email notifications for new messages' },
                     { id: 'push_notifications', label: 'Push Notifications', description: 'Receive push notifications on your device' },
                     { id: 'sound_notifications', label: 'Sound Notifications', description: 'Play sound when receiving messages' },
                     { id: 'desktop_notifications', label: 'Desktop Notifications', description: 'Show desktop notifications' }
-                  }.map((setting) => (
+                  ].map((setting) => (
                     <div key={setting.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
                       <div>
                         <h4 className="text-sm font-medium text-gray-900">{setting.label}</h4>
