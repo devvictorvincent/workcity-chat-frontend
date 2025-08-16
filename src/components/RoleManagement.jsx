@@ -29,21 +29,12 @@ const RoleManagement = () => {
   }, []);
 
   const fetchRoles = async () => {
-    try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/admin/roles`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setRoles(data);
-      }
-    } catch (error) {
-      console.error('Error fetching roles:', error);
-    }
+   const roles =[
+     { id: 1, name: 'Admin', permissions: ['manage_users', 'manage_roles'] },
+     { id: 2, name: 'Moderator', permissions: ['manage_users'] },
+     { id: 3, name: 'User', permissions: [] }
+   ];
+   setRoles(roles);
   };
 
   const onSubmit = async (data) => {
@@ -168,7 +159,7 @@ const RoleManagement = () => {
         ))}
       </div>
 
-      {/* Add/Edit Modal */}
+      {/* Add/Edit Here */}
       {showAddModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">

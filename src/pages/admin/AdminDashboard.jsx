@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import Analytics from '../../components/Analytics';
 import UserManagement from '../../components/UserManagement';
 import RoleManagement from '../../components/RoleManagement';
 import MessagesView from '../../components/MessagesView';
-
- 
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('analytics');
@@ -16,7 +15,8 @@ const AdminDashboard = () => {
     totalMessages: 0,
     totalRoles: 0
   });
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
   const menuTabs = [
     { id: 'analytics', name: 'Analytics', icon: 'chart-bar' },
@@ -47,7 +47,11 @@ const AdminDashboard = () => {
     }
   };
 
-  // Check if user is admin
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
+
   if (user?.role !== 'admin') {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -70,9 +74,12 @@ const AdminDashboard = () => {
             <p className="text-gray-600">Manage users, roles, and monitor system activity</p>
           </div>
           <div className="flex items-center space-x-4">
-            <div className="bg-blue-50 px-4 py-2 rounded-lg">
-              <span className="text-sm font-medium text-blue-600">Admin Panel</span>
-            </div>
+            <button 
+              className="bg-blue-50 px-4 py-2 rounded-lg hover:bg-blue-100 transition duration-200" 
+              onClick={handleLogout}
+            >
+              <span className="text-sm font-medium text-blue-600">Log out</span>
+            </button>
           </div>
         </div>
       </div>

@@ -16,6 +16,14 @@ const UserManagement = () => {
     reset
   } = useForm();
 
+  const predefinedRoles = [
+    { value: 'admin', label: 'Admin' },
+    { value: 'agent', label: 'Agent' },
+    { value: 'customer', label: 'Customer' },
+    { value: 'designer', label: 'Designer' },
+    { value: 'merchant', label: 'Merchant' }
+  ];
+
   useEffect(() => {
     fetchUsersList();
   }, []);
@@ -48,7 +56,6 @@ const UserManagement = () => {
       const data = await response.json();
       console.log('gotten user data', data);
       
-      
       if (data && data.users && Array.isArray(data.users)) {
         setUsers(data.users);
       } else if (Array.isArray(data)) {
@@ -66,7 +73,6 @@ const UserManagement = () => {
     }
   };
 
-   
   useEffect(() => {
     const delayedSearch = setTimeout(() => {
       if (searchTerm.trim()) {
@@ -81,11 +87,18 @@ const UserManagement = () => {
 
   const onSubmit = async (data) => {
     try {
-      const url = editingUser 
-        ? `http://localhost:5000/admin/users/${editingUser.id}`
+      const isEditing = editingUser && (editingUser.id || editingUser._id);
+      const userId = editingUser?.id || editingUser?._id;
+      
+      console.log('Editing user:', editingUser);
+      console.log('User ID:', userId);
+      console.log('Is editing:', isEditing);
+      
+      const url = isEditing 
+        ? `http://localhost:5000/admin/users/${userId}`
         : `http://localhost:5000/admin/users`;
       
-      const method = editingUser ? 'PUT' : 'POST';
+      const method = isEditing ? 'PUT' : 'POST';
 
       const response = await fetch(url, {
         method,
@@ -98,9 +111,7 @@ const UserManagement = () => {
 
       if (response.ok) {
         fetchUsersList();
-        setShowAddModal(false);
-        setEditingUser(null);
-        reset();
+        handleCloseModal();
       } else {
         const errorData = await response.json();
         console.error('Error saving user:', errorData);
@@ -112,9 +123,36 @@ const UserManagement = () => {
     }
   };
 
+  const handleCloseModal = () => {
+    setShowAddModal(false);
+    setEditingUser(null);
+    reset({
+      name: '',
+      email: '',
+      role: '',
+      password: ''
+    });
+  };
+
+  const handleAddUser = () => {
+    setEditingUser(null);
+    reset({
+      name: '',
+      email: '',
+      role: '',
+      password: ''
+    });
+    setShowAddModal(true);
+  };
+
   const handleEdit = (user) => {
+    console.log('Setting editing user:', user);
     setEditingUser(user);
-    reset(user);
+    reset({
+      name: user.name,
+      email: user.email,
+      role: user.role
+    });
     setShowAddModal(true);
   };
 
@@ -142,7 +180,17 @@ const UserManagement = () => {
     }
   };
 
- 
+  const getRoleColor = (role) => {
+    const colors = {
+      admin: 'bg-red-100 text-red-800',
+      agent: 'bg-blue-100 text-blue-800',
+      customer: 'bg-green-100 text-green-800',
+      designer: 'bg-purple-100 text-purple-800',
+      merchant: 'bg-orange-100 text-orange-800'
+    };
+    return colors[role] || 'bg-gray-100 text-gray-800';
+  };
+
   const filteredUsers = Array.isArray(users) ? users.filter(user =>
     user.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     user.email?.toLowerCase().includes(searchTerm.toLowerCase())
@@ -150,15 +198,10 @@ const UserManagement = () => {
 
   return (
     <div className="space-y-6">
-     
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold text-gray-900">User Management</h2>
         <button
-          onClick={() => {
-            setEditingUser(null);
-            reset();
-            setShowAddModal(true);
-          }}
+          onClick={handleAddUser}
           className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition duration-200 flex items-center space-x-2"
         >
           <FontAwesomeIcon icon="plus" className="w-4 h-4" />
@@ -166,7 +209,6 @@ const UserManagement = () => {
         </button>
       </div>
 
-      
       <div className="relative">
         <FontAwesomeIcon icon="search" className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
         <input
@@ -178,14 +220,12 @@ const UserManagement = () => {
         />
       </div>
 
-       
       {loading && (
         <div className="flex justify-center py-8">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
         </div>
       )}
 
-        
       {!loading && (
         <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
           <div className="overflow-x-auto">
@@ -208,7 +248,7 @@ const UserManagement = () => {
                   </tr>
                 ) : (
                   filteredUsers.map((user) => (
-                    <tr key={user.id} className="hover:bg-gray-50">
+                    <tr key={user.id || user._id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           <img
@@ -226,11 +266,7 @@ const UserManagement = () => {
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                          user.role === 'admin' ? 'bg-red-100 text-red-800' :
-                          user.role === 'moderator' ? 'bg-yellow-100 text-yellow-800' :
-                          'bg-green-100 text-green-800'
-                        }`}>
+                        <span className={`px-2 py-1 text-xs font-medium rounded-full ${getRoleColor(user.role)}`}>
                           {user.role}
                         </span>
                       </td>
@@ -253,7 +289,7 @@ const UserManagement = () => {
                             <FontAwesomeIcon icon="edit" className="w-4 h-4" />
                           </button>
                           <button
-                            onClick={() => handleDelete(user.id)}
+                            onClick={() => handleDelete(user.id || user._id)}
                             className="text-red-600 hover:text-red-900 p-1"
                             title="Delete user"
                           >
@@ -270,7 +306,6 @@ const UserManagement = () => {
         </div>
       )}
 
-     
       {showAddModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-md">
@@ -305,9 +340,11 @@ const UserManagement = () => {
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="">Select Role</option>
-                  <option value="user">User</option>
-                  <option value="moderator">Moderator</option>
-                  <option value="admin">Admin</option>
+                  {predefinedRoles.map((role) => (
+                    <option key={role.value} value={role.value}>
+                      {role.label}
+                    </option>
+                  ))}
                 </select>
                 {errors.role && <p className="text-red-500 text-sm mt-1">{errors.role.message}</p>}
               </div>
@@ -327,11 +364,7 @@ const UserManagement = () => {
               <div className="flex justify-end space-x-2 pt-4">
                 <button
                   type="button"
-                  onClick={() => {
-                    setShowAddModal(false);
-                    setEditingUser(null);
-                    reset();
-                  }}
+                  onClick={handleCloseModal}
                   className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50"
                 >
                   Cancel
