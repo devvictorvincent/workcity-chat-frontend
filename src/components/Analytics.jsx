@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
-const Analytics = ({ stats }) => {
+const Analytics = () => {
   const [timeRange, setTimeRange] = useState('7d');
   const [analyticsData, setAnalyticsData] = useState({
     messageStats: [],
@@ -13,60 +13,54 @@ const Analytics = ({ stats }) => {
       errorRate: '0.1%'
     }
   });
+    const [stats, setStats] = useState({
+    overview: {
+      totalUsers: 0,
+      activeUsers: 0,   
+        offlineUsers: 0,
+        totalMessages: 0,
+        },
+    });
 
   useEffect(() => {
-    fetchAnalyticsData();
+   fetchAdminStats();
   }, [timeRange]);
 
-  const fetchAnalyticsData = async () => {
-    try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/admin/analytics?range=${timeRange}`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setAnalyticsData(data);
+  
+const fetchAdminStats = async () => {
+  try {
+    const token = localStorage.getItem('token'); // or however you store your JWT
+    
+    const response = await fetch('http://localhost:5000/admin/stats', {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
       }
-    } catch (error) {
-      console.error('Error fetching analytics:', error);
-      // Mock data for demo
-      setAnalyticsData({
-        messageStats: [
-          { date: '2024-01-01', messages: 45, users: 12 },
-          { date: '2024-01-02', messages: 52, users: 15 },
-          { date: '2024-01-03', messages: 38, users: 10 },
-          { date: '2024-01-04', messages: 67, users: 18 },
-          { date: '2024-01-05', messages: 71, users: 22 },
-          { date: '2024-01-06', messages: 58, users: 16 },
-          { date: '2024-01-07', messages: 63, users: 19 }
-        ],
-        userActivity: [
-          { hour: '00:00', active: 5 },
-          { hour: '06:00', active: 12 },
-          { hour: '09:00', active: 45 },
-          { hour: '12:00', active: 67 },
-          { hour: '15:00', active: 52 },
-          { hour: '18:00', active: 38 },
-          { hour: '21:00', active: 28 }
-        ],
-        popularChannels: [
-          { name: 'General', messages: 234, members: 45 },
-          { name: 'Development', messages: 189, members: 23 },
-          { name: 'Design Team', messages: 156, members: 12 },
-          { name: 'Marketing', messages: 98, members: 18 }
-        ],
-        systemHealth: {
-          uptime: '99.9%',
-          responseTime: '120ms',
-          errorRate: '0.1%'
-        }
-      });
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to fetch admin stats');
     }
-  };
+    
+    const data = await response.json();
+    setStats(data);
+  } catch (error) {
+    console.error('Error fetching admin stats:', error);
+    throw error;
+  }
+};
+
+// Usage example
+fetchAdminStats()
+  .then(stats => {
+    console.log('Total Users:', stats.overview.totalUsers);
+    console.log('Active Users:', stats.overview.activeUsers);
+    console.log('Offline Users:', stats.overview.offlineUsers);
+    console.log('Total Messages:', stats.overview.totalMessages);
+    console.log('Users by Role:', stats.usersByRole);
+  })
+  .catch(error => console.error('Stats fetch failed:', error));
 
   const timeRangeOptions = [
     { value: '24h', label: 'Last 24 Hours' },
@@ -89,8 +83,8 @@ const Analytics = ({ stats }) => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-blue-100 text-sm">Total Messages</p>
-              <p className="text-2xl font-bold">{stats.totalMessages}</p>
-              <p className="text-blue-100 text-xs mt-1">+12% from last week</p>
+              <p className="text-2xl font-bold">{stats.overview.totalMessages}</p>
+               
             </div>
             <FontAwesomeIcon icon="envelope" className="w-8 h-8 text-blue-200" />
           </div>
@@ -99,8 +93,18 @@ const Analytics = ({ stats }) => {
         <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-xl p-6 text-white">
           <div className="flex items-center justify-between">
             <div>
+              <p className="text-green-100 text-sm">Total Users</p>
+              <p className="text-2xl font-bold">{stats.overview.totalUsers}</p> 
+            </div>
+            <FontAwesomeIcon icon="users" className="w-8 h-8 text-green-200" />
+          </div>
+        </div>
+        
+          <div className="bg-gradient-to-br from-green-500 to-gray-600 rounded-xl p-6 text-white">
+          <div className="flex items-center justify-between">
+            <div>
               <p className="text-green-100 text-sm">Active Users</p>
-              <p className="text-2xl font-bold">{stats.activeUsers}</p> 
+              <p className="text-2xl font-bold">{stats.overview.activeUsers}</p> 
             </div>
             <FontAwesomeIcon icon="users" className="w-8 h-8 text-green-200" />
           </div>
@@ -110,7 +114,7 @@ const Analytics = ({ stats }) => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-purple-100 text-sm">Offline Users</p>
-              <p className="text-2xl font-bold">{analyticsData.systemHealth.errorRate}</p>
+              <p className="text-2xl font-bold">{stats.overview.offlineUsers}</p>
               <p className="text-purple-100 text-xs mt-1"> </p>
             </div>
             <FontAwesomeIcon icon="clock" className="w-8 h-8 text-purple-200" />
